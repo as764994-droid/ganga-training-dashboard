@@ -1,6 +1,6 @@
 # 📊 Project GANGA — Training Dashboard
 
-**Live Dashboard →** `[https://YOUR-USERNAME.github.io/ganga-training-dashboard](https://as764994-droid.github.io/ganga-training-dashboard/)`
+**Live Dashboard →** `https://as764994-droid.github.io/ganga-training-dashboard/`
 
 A responsive, interactive training session dashboard for **Project GANGA** (Government Assisted Network for Growth & Advancement) — Uttar Pradesh Government's broadband entrepreneurship initiative.
 
