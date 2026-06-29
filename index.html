@@ -606,12 +606,14 @@ tr:hover td{background:#fafaf9}
 
 <div class="filter-row">
   <select id="filterKAM"><option value="">All KAMs</option></select>
+  <button id="backupToggleBtn" title="Toggle Backup KAM visibility" style="padding:6px 12px;border:1px solid #e1e0d9;border-radius:6px;font-size:12px;background:#fff;color:#0b0b0b;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s">⬡ All KAMs</button>
   <select id="filterIntern"><option value="">All Interns</option>
     <option value="AS">Ayush Singh</option>
     <option value="AP">Abhishek Pathak</option>
     <option value="TP">Tejaswita Pandey</option>
     <option value="PJ">Pragya Jaiswal</option>
     <option value="SJ">Sanjana</option>
+    <option value="LA">Laiba Alam</option>
   </select>
   <select id="filterDistrict"><option value="">All Districts</option></select>
   <select id="filterGender"><option value="">All Genders</option></select>
@@ -1147,8 +1149,14 @@ function applyFilters(){
   const dist=document.getElementById('filterDistrict').value;
   const gender=document.getElementById('filterGender').value;
   const status=document.getElementById('filterStatus').value;
+  const backupState = window._backupState || 0;
   filtered=allData.filter(r=>{
-    if(kam&&(r['KAM NAME']||'').trim()!==kam)return false;
+    const kamName = (r['KAM NAME']||'').trim();
+    const isBackup = kamName.toLowerCase() === 'backup';
+    // Backup toggle: 0=All, 1=Without Backup, 2=Only Backup
+    if(backupState === 1 && isBackup) return false;
+    if(backupState === 2 && !isBackup) return false;
+    if(kam && kamName!==kam)return false;
     if(intern&&(r['Interns']||'').trim()!==intern)return false;
     if(dist&&(r['District']||'').trim()!==dist)return false;
     if(gender&&(r['Gender']||'').trim().toLowerCase()!==gender.toLowerCase())return false;
@@ -1157,6 +1165,27 @@ function applyFilters(){
   });
   render();
 }
+
+// ═══ BACKUP TOGGLE ═══
+(function(){
+  const btn = document.getElementById('backupToggleBtn');
+  // States: 0 = All, 1 = Without Backup, 2 = Only Backup
+  const states = [
+    { label: '⬡ All KAMs',       style: 'background:#fff;color:#0b0b0b;border-color:#e1e0d9' },
+    { label: '✓ Without Backup', style: 'background:#e6f7e6;color:#0a6b0a;border-color:#1baf7a' },
+    { label: '★ Only Backup',    style: 'background:#fff8e1;color:#a36800;border-color:#eda100' },
+  ];
+  let state = 0;
+  window._backupState = 0;
+  btn.addEventListener('click', function(){
+    state = (state + 1) % 3;
+    window._backupState = state;
+    const s = states[state];
+    btn.textContent = s.label;
+    btn.style.cssText = 'padding:6px 12px;border:1px solid;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s;' + s.style;
+    applyFilters();
+  });
+})();
 
 ['filterKAM','filterIntern','filterDistrict','filterGender','filterStatus'].forEach(id=>{
   document.getElementById(id).addEventListener('change',applyFilters);
