@@ -998,9 +998,11 @@ function render() {
   legend('legendGenderConfirmed',gcL,gColFor(gcL),gcC,gcTotal);
 
   // KAM full breakdown bar chart + detail table
+  // "Backup" is not a real KAM — exclude it from this section entirely
   const kamM={};
   filtered.forEach(r=>{
-    const k=r['KAM NAME']||'Unknown';
+    const k=(r['KAM NAME']||'Unknown').trim();
+    if(k.toLowerCase()==='backup') return; // skip Backup rows
     if(!kamM[k])kamM[k]={total:0,confirmed:0,denied:0,nextBatch:0,pending:0,rows:[]};
     kamM[k].total++;
     kamM[k].rows.push(r);
@@ -1011,7 +1013,9 @@ function render() {
     else if(s==='Pending')kamM[k].pending++;
   });
   const kamE=Object.entries(kamM).sort((a,b)=>b[1].total-a[1].total);
-  document.getElementById('kamTotalBadge').textContent=kamE.length+' KAMs · '+filtered.length+' total leads';
+  const kamLeadTotal = kamE.reduce((sum,[,v])=>sum+v.total,0);
+  const backupCount = filtered.filter(r=>(r['KAM NAME']||'').trim().toLowerCase()==='backup').length;
+  document.getElementById('kamTotalBadge').textContent=kamE.length+' KAMs · '+kamLeadTotal+' leads'+(backupCount?' · '+backupCount+' Backup (excluded)':'');
   dc('chartKAM');
   // On desktop show full name on one line; on mobile split to two lines
   const isMobileView = window.innerWidth <= 640;
