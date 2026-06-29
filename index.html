@@ -606,7 +606,7 @@ tr:hover td{background:#fafaf9}
 
 <div class="filter-row">
   <select id="filterKAM"><option value="">All KAMs</option></select>
-  <button id="backupToggleBtn" title="Toggle Backup KAM visibility" style="padding:6px 12px;border:1px solid #e1e0d9;border-radius:6px;font-size:12px;background:#fff;color:#0b0b0b;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s">⬡ All KAMs</button>
+  <button id="backupToggleBtn" title="Toggle Backup KAM visibility" style="padding:6px 12px;border:1px solid #e1e0d9;border-radius:6px;font-size:12px;background:#fff;color:#0b0b0b;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s;display:none">⬡ All KAMs</button>
   <select id="filterIntern"><option value="">All Interns</option>
     <option value="AS">Ayush Singh</option>
     <option value="AP">Abhishek Pathak</option>
@@ -1138,9 +1138,19 @@ function populateFilters() {
     if(opts.includes(cur))sel.value=cur;
   }
   fill('filterKAM',r=>(r['KAM NAME']||'').trim());
-  // filterIntern: keep hardcoded full-name options, don't overwrite
   fill('filterDistrict',r=>(r['District']||'').trim());
   fill('filterGender',r=>(r['Gender']||'').trim().toLowerCase());
+  // Show backup toggle only if loaded data has at least one Backup KAM row
+  const hasBackup = allData.some(r => (r['KAM NAME']||'').trim().toLowerCase() === 'backup');
+  const btn = document.getElementById('backupToggleBtn');
+  if (!hasBackup) {
+    btn.style.display = 'none';
+    window._backupState = 0;
+    btn.textContent = '⬡ All KAMs';
+    btn.setAttribute('style', 'padding:6px 12px;border:1px solid #e1e0d9;border-radius:6px;font-size:12px;background:#fff;color:#0b0b0b;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .15s;display:none');
+  } else {
+    btn.style.display = '';
+  }
 }
 
 function applyFilters(){
